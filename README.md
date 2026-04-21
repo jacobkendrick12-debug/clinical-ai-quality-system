@@ -64,3 +64,15 @@ Returns:
   },
   "reasons": ["ALL fields present"]
 }
+
+## Example Output
+
+Example of unsafe consultation:
+
+Status: dangerous  
+Reasons:
+- Missing diagnosis  
+- Missing medications  
+- Dosage mentioned without medication  
+
+This demonstrates the system’s ability to detect unsafe AI outputs before clinical use.
