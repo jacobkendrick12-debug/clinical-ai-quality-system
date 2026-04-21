@@ -1,78 +1,90 @@
-# Clinical AI API
+# 🏥 Clinical AI Quality Control System
 
-## Overview
-This project is a simple Clinical AI pipeline that processes consultation audio into structured medical data.
+## 📌 Overview
+This project implements a clinical AI pipeline that processes consultation data and applies a **quality control layer** to detect incomplete or unsafe outputs before they are used in clinical workflows.
 
-The system simulates how clinical conversations can be transformed into usable healthcare insights.
+The system demonstrates how AI-generated clinical data should be validated and flagged rather than blindly trusted.
 
 ---
 
 ## 🚀 Features
 - FastAPI backend
-- Audio → transcript (mocked)
-- Clinical data extraction
-- Quality evaluation (PASS / FAIL)
-- SQLite database storage
+- Next.js frontend dashboard
+- Simulated pipeline (transcription → extraction → evaluation)
+- Structured clinical data extraction (mocked)
+- Quality control with safety checks
+- Status classification:
+  - `complete`
+  - `needs_review`
+  - `dangerous`
+- Explainable reasoning (flags/reasons)
 - REST API endpoints
-- Auto-generated API docs
 
 ---
 
 ## 🧠 System Flow
 
-1. **Transcription**
-   - Converts audio into text (currently mocked)
+1. **Transcription (Mocked)**
+   - Simulates audio → text conversion
 
-2. **Clinical Extraction**
-   - Extracts structured fields:
-     - chief complaint
-     - vital signs
-     - diagnosis
-     - medications
-     - follow-up
+2. **Clinical Data Extraction**
+   Extracted fields:
+   - chief_complaint
+   - vital_signs
+   - diagnosis
+   - medications
+   - follow_up
+   - dosage
 
-3. **Evaluation**
-   - Checks if required fields are present
-   - Returns PASS or FAIL with reasons
+3. **Quality Evaluation (Core Logic)**
+   The system validates extracted data using deterministic rules:
 
-4. **Storage**
-   - Results stored in SQLite database
+   - Missing required fields → `needs_review`
+   - Clinically unsafe conditions → `dangerous`
+   - Complete + valid → `complete`
+
+   Example rules:
+   - Missing diagnosis → flag
+   - Missing medication → flag
+   - Dosage without medication → **dangerous**
 
 ---
 
 ## 📡 API Endpoints
 
-### 1. Process Consultation
-**POST** `/consultations/{consultation_id}/process`
+### POST `/consultations/{id}/process`
+Runs the pipeline:
+- transcription
+- extraction
+- quality evaluation
 
-- Processes a consultation
-- Stores results in DB
-
----
-
-### 2. Get Consultation Result
-**GET** `/consultations/{consultation_id}/result`
-
+### GET `/consultations/{id}/result`
 Returns:
+
 ```json
 {
-  "status": "PASS",
-  "transcript": "patient has fever...",
+  "status": "dangerous",
+  "transcript": "Patient has fever. Prescribed 500mg daily.",
   "clinical_data": {
     "chief_complaint": "fever",
-    "diagnosis": "infection"
+    "diagnosis": null,
+    "medications": null,
+    "dosage": "500mg"
   },
-  "reasons": ["ALL fields present"]
-}
-
-## Example Output
+  "reasons": [
+    "Missing diagnosis",
+    "Missing medications",
+    "Dosage mentioned without medication"
+  ]
+} 
 
 Example of unsafe consultation:
 
-Status: dangerous  
+Status: dangerous
 Reasons:
-- Missing diagnosis  
-- Missing medications  
-- Dosage mentioned without medication  
 
-This demonstrates the system’s ability to detect unsafe AI outputs before clinical use.
+Missing diagnosis
+Missing medications
+Dosage mentioned without medication
+
+This demonstrates the system’s ability to detect and block unsafe AI outputs before clinical use.
